@@ -1,0 +1,49 @@
+services:
+  openpbs:
+    networks:
+      - pbsnet
+    container_name: openpbs
+    hostname: openpbs
+    build: .
+    ports:
+      - "17001:17001"
+      - "15001-15010:15001-15010"
+    volumes:
+      - ./data:/var/spool/pbs
+      - ./project:/home/pbsuser/project
+    tty: true
+    stdin_open: true
+
+  worker1:
+    networks:
+      - pbsnet
+    container_name: worker1
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    hostname: worker1
+    environment:
+      - PBS_SERVER=openpbs
+    depends_on:
+      - openpbs
+    tty: true
+    stdin_open: true
+
+  worker2:
+    networks:
+      - pbsnet
+    container_name: worker2
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    hostname: worker2
+    environment:
+      - PBS_SERVER=openpbs
+    depends_on:
+      - openpbs
+    tty: true
+    stdin_open: true
+    
+networks:
+  pbsnet:
+    name: pbsnet

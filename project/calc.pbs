@@ -1,0 +1,9 @@
+#!/bin/bash
+#PBS -N MonteCarlo
+#PBS -l walltime=00:01:00
+#PBS -o /home/pbsuser/project/results/out_0.txt
+#PBS -e /home/pbsuser/project/results/err_0.txt
+#PBS -V
+
+cd /home/pbsuser/project
+python3 montecarlo_native.py
