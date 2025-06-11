@@ -1,9 +1,32 @@
 #!/bin/bash
-#PBS -N MonteCarlo
-#PBS -l walltime=00:01:00
-#PBS -o /home/pbsuser/project/results/out_0.txt
-#PBS -e /home/pbsuser/project/results/err_0.txt
-#PBS -V
+#PBS -N ParallelMonteCarlo
+#PBS -J 1-2
+#PBS -l walltime=00:05:00
+#PBS -l select=1:ncpus=1
+#PBS -o /home/pbsuser/project/results/mc_out_${PBS_ARRAY_INDEX}.txt
+#PBS -e /home/pbsuser/project/results/mc_err_${PBS_ARRAY_INDEX}.txt
+#PBS -V  # Export all passed environment variables
+
+mkdir -p /home/pbsuser/project/results
+
+echo "========================================="
+echo "Parallel Monte Carlo Job ${PBS_ARRAY_INDEX}"
+echo "Started at: $(date)"
+echo "Running on: $(hostname)"
+echo "PBS Job ID: ${PBS_JOBID}"
+echo "Array Index: ${PBS_ARRAY_INDEX}"
+echo "========================================="
 
 cd /home/pbsuser/project
-python3 montecarlo_native.py
+
+echo "Configuration:"
+echo "  Samples per job: ${SAMPLES_PER_JOB}"
+echo "  Bounds: ${BOUNDS}"
+echo ""
+
+# Run Monte Carlo with arguments
+python3 montecarlo.py ${PBS_ARRAY_INDEX} ${SAMPLES_PER_JOB} "${BOUNDS}"
+
+echo ""
+echo "Job ${PBS_ARRAY_INDEX} completed at: $(date)"
+echo "========================================="

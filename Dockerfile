@@ -31,8 +31,11 @@ RUN apt-get update && apt-get install -y \
     postgresql-server-dev-all \
     sendmail \
     unzip \
+    openssh-server \
     libcjson-dev && \
     rm -rf /var/lib/apt/lists/*
+
+RUN pip install numpy
 
 # Clone and build OpenPBS
 RUN git clone https://github.com/openpbs/openpbs.git /openpbs && \

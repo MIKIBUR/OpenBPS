@@ -11,6 +11,7 @@ services:
     volumes:
       - ./data:/var/spool/pbs
       - ./project:/home/pbsuser/project
+      - ssh-keys:/shared-ssh
     tty: true
     stdin_open: true
 
@@ -26,6 +27,9 @@ services:
       - PBS_SERVER=openpbs
     depends_on:
       - openpbs
+    volumes:
+      - ./project:/home/pbsuser/project
+      - ssh-keys:/shared-ssh
     tty: true
     stdin_open: true
 
@@ -41,9 +45,14 @@ services:
       - PBS_SERVER=openpbs
     depends_on:
       - openpbs
+    volumes:
+      - ./project:/home/pbsuser/project
+      - ssh-keys:/shared-ssh
     tty: true
     stdin_open: true
     
 networks:
   pbsnet:
     name: pbsnet
+volumes:
+  ssh-keys:

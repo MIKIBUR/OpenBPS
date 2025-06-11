@@ -6,6 +6,54 @@ mkdir -p /var/spool/pbs
 echo "Running PBS postinstall..."
 /opt/pbs/libexec/pbs_postinstall
 
+echo "reject_remote_stage = true" > /var/spool/pbs/mom_priv/config
+
+# Create pbsuser if not exists
+if ! id -u pbsuser >/dev/null 2>&1; then
+    echo "Creating user pbsuser"
+    useradd -m -s /bin/bash pbsuser
+fi
+
+# Ensure mounted project directory exists and is owned by pbsuser
+mkdir -p /home/pbsuser/project
+chown -R pbsuser:pbsuser /home/pbsuser/project
+USER_HOME=/home/pbsuser
+SSH_DIR="$USER_HOME/.ssh"
+
+# Ensure user and SSH directory
+useradd -m -s /bin/bash pbsuser || true
+mkdir -p "$SSH_DIR"
+touch "$SSH_DIR/authorized_keys"
+
+# Import all public keys from workers
+echo "Importing SSH keys from workers..."
+
+# Wait up to 60 seconds for at least one .pub file to appear
+TIMEOUT=60
+ELAPSED=0
+while [ "$ELAPSED" -lt "$TIMEOUT" ]; do
+  if compgen -G "/shared-ssh/*.pub" > /dev/null; then
+    echo "Found public SSH keys from workers."
+    break
+  fi
+  sleep 1
+  ELAPSED=$((ELAPSED + 1))
+done
+
+if compgen -G "/shared-ssh/*.pub" > /dev/null; then
+  for pub in /shared-ssh/*.pub; do
+    if ! grep -qxF "$(cat "$pub")" "$SSH_DIR/authorized_keys"; then
+      cat "$pub" >> "$SSH_DIR/authorized_keys"
+    fi
+  done
+else
+  echo "Timeout: No public keys found in /shared-ssh after $TIMEOUT seconds."
+fi
+
+chown -R pbsuser:pbsuser "$SSH_DIR"
+chmod 700 "$SSH_DIR"
+chmod 600 "$SSH_DIR/authorized_keys"
+
 # Get container IP and update /etc/hosts for 'openpbs'
 CONTAINER_IP=$(hostname -I | awk '{print $1}')
 grep -v 'openpbs' /etc/hosts > /tmp/hosts
@@ -20,21 +68,13 @@ echo "PBS_SERVER=openpbs" >> /etc/environment
 # Source PBS environment variables
 source /etc/profile.d/pbs.sh
 
-# Wait for network to settle
-sleep 3
-
-# Create pbsuser if not exists
-if ! id -u pbsuser >/dev/null 2>&1; then
-    echo "Creating user pbsuser"
-    useradd -m -s /bin/bash pbsuser
-fi
-
-# Ensure mounted project directory exists and is owned by pbsuser
-mkdir -p /home/pbsuser/project
-chown -R pbsuser:pbsuser /home/pbsuser/project
+# Start SSH service
+service ssh start
 
 # Start PBS service
 /etc/init.d/pbs start
+
+qmgr -c "set server job_history_enable = True"
 
 # Add nodes if missing
 add_node_if_missing() {
@@ -49,8 +89,6 @@ add_node_if_missing() {
 
 add_node_if_missing worker1
 add_node_if_missing worker2
-
-pbsnodes -a
 
 # Tail logs to keep container running
 tail -f /var/spool/pbs/server_logs/* || true
