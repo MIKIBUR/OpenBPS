@@ -1,0 +1,7 @@
+# Normalize all text files to LF
+* text=auto eol=lf
+
+# Force shell scripts to use LF
+*.sh text eol=lf
+*.py text eol=lf
+*.txt text eol=lf
