@@ -15,13 +15,6 @@ mkdir -p "$SSH_DIR"
 chown -R pbsuser:pbsuser "$SSH_DIR"
 chmod 700 "$SSH_DIR"
 
-if [ ! -f "$KEY_FILE" ]; then
-  echo "Generating SSH key for $(hostname)..."
-  su -p -c "ssh-keygen -t rsa -N '' -f $KEY_FILE" pbsuser
-fi
-
-mkdir -p /shared-ssh
-cp "$KEY_FILE.pub" "/shared-ssh/$(hostname)_id_rsa.pub"
 cat > "$SSH_DIR/config" <<EOF
 Host *
     StrictHostKeyChecking no

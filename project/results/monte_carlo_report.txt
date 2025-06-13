@@ -1,15 +1,15 @@
 PARALLEL MONTE CARLO INTEGRATION REPORT
 ==================================================
-Generated: 2025-06-10 19:06:41
+Generated: 2025-06-13 17:43:55
 
 Total jobs analyzed: 2
 Total samples processed: 4,000,000
-Total computation time: 7.62 seconds
+Total computation time: 7.55 seconds
 
 SUMMARY:
   Jobs: 2
   Samples: 4,000,000
   Result: -0.000423 ± 0.000023
-  Time: 7.62s
-  Efficiency: 525083 samples/s
+  Time: 7.55s
+  Efficiency: 529488 samples/s
 

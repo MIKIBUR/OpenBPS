@@ -29,20 +29,18 @@ class AdvancedMonteCarlo:
         return volume * np.mean(values), np.std(values) / np.sqrt(samples)
 
 def test_function_2d(point):
-    """2D test function: f(x,y) = sin(\u03c0x) * cos(\u03c0y) * exp(-(x²+y²))"""
+    """2D test function: f(x,y) = sin(πx) * cos(πy) * exp(-(x²+y²))"""
     x, y = point
     return np.sin(np.pi * x) * np.cos(np.pi * y) * np.exp(-(x**2 + y**2))
 
-def run_monte_carlo_mpi(samples_total, bounds):
+def run_monte_carlo_mpi(samples_per_job, bounds):
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     size = comm.Get_size()
 
-    samples_per_proc = samples_total // size
-
     mc = AdvancedMonteCarlo(seed=42 + rank)
     start_time = time.time()
-    result, error = mc.uniform_sampling(test_function_2d, bounds, samples_per_proc)
+    result, error = mc.uniform_sampling(test_function_2d, bounds, samples_per_job)
     end_time = time.time()
 
     # Gather results to root
@@ -56,7 +54,8 @@ def run_monte_carlo_mpi(samples_total, bounds):
         total_time = max(all_times)
 
         final_result = {
-            'samples_total': samples_total,
+            'samples_per_job': samples_per_job,
+            'samples_total': samples_per_job * size,
             'bounds': str(bounds),
             'result': float(avg_result),
             'error': float(combined_error),
@@ -65,11 +64,11 @@ def run_monte_carlo_mpi(samples_total, bounds):
             'mpi_ranks': size
         }
 
-        output_file = "/home/pbsuser/project/results/mc_result_mpi.json"
+        output_file = "/home/pbsuser/project/results/mpi_mc_result.json"
         with open(output_file, 'w') as f:
             json.dump(final_result, f, indent=2)
 
-        print(f"Final MPI result: {avg_result:.6f} ± {combined_error:.6f}")
+        print(f"Output file location: {output_file}")
         print(f"Total computation time: {total_time:.2f} seconds")
 
 if __name__ == "__main__":
@@ -77,10 +76,10 @@ if __name__ == "__main__":
     import ast
 
     if len(sys.argv) < 2:
-        print("Usage: mpiexec -n <n> python montecarlo_mpi.py <total_samples> [bounds]")
+        print("Usage: mpiexec -n <n> python3 montecarlo_mpi.py <samples_per_job> [bounds]")
         sys.exit(1)
 
-    samples_total = int(sys.argv[1])
+    samples_per_job = int(sys.argv[1])
 
     if len(sys.argv) > 2:
         try:
@@ -93,4 +92,4 @@ if __name__ == "__main__":
     else:
         bounds = [(-1, 1), (-1, 1)]
 
-    run_monte_carlo_mpi(samples_total, bounds)
+    run_monte_carlo_mpi(samples_per_job, bounds)

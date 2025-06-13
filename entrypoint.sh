@@ -69,5 +69,8 @@ add_node_if_missing() {
 add_node_if_missing worker1
 add_node_if_missing worker2
 
+# Add symlink for easier execution
+ln -sf /home/pbsuser/project/run.sh ./run.sh
+
 # Tail logs to keep container running
 tail -f /var/spool/pbs/server_logs/* || true

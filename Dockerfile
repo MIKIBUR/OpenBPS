@@ -16,6 +16,8 @@ RUN apt-get update && apt-get install -y \
     libxt-dev \
     libedit-dev \
     libical-dev \
+    libmpich-dev \
+    libopenmpi-dev \
     libncurses-dev \
     swig \
     libexpat-dev \
@@ -35,7 +37,7 @@ RUN apt-get update && apt-get install -y \
     libcjson-dev && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip install numpy
+RUN pip install numpy mpi4py
 
 # Clone and build OpenPBS
 RUN git clone https://github.com/openpbs/openpbs.git /openpbs && \

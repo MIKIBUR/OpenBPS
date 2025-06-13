@@ -184,7 +184,7 @@ def save_summary_report(summary_data, results, output_file="/home/pbsuser/projec
     print(f"Detailed report saved to: {output_file}")
 
 if __name__ == "__main__":
-    results_dir = sys.argv[1] if len(sys.argv) > 1 else "project/results"
+    results_dir = sys.argv[1] if len(sys.argv) > 1 else "/home/pbsuser/project/results"
     
     print("Loading Monte Carlo results...")
     results, error_files = load_results(results_dir)
@@ -197,12 +197,13 @@ if __name__ == "__main__":
     
     # Analyze results
     summary_data = analyze_results(results)
-    
+    mpl_works = True
     # Create plots (requires matplotlib)
     try:
         create_comparison_plot(summary_data)
     except ImportError:
         print("Matplotlib not available - skipping plots")
+        mpl_works = False
     except Exception as e:
         print(f"Error creating plots: {e}")
     
@@ -212,6 +213,7 @@ if __name__ == "__main__":
     print("\n" + "="*60)
     print("Analysis complete! Check the results directory for:")
     print("  - Individual job results: mc_result_*.json")
-    print("  - Comparison plot: monte_carlo_comparison.png")
+    if(mpl_works):
+        print("  - Comparison plot: monte_carlo_comparison.png")
     print("  - Summary report: monte_carlo_report.txt")
     print("="*60)
