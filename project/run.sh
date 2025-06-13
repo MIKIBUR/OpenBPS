@@ -1,10 +1,24 @@
 #!/bin/bash
 
-# Set default values if not passed
+# Check first argument for mode
+MODE="$1"
+
+if [[ "$MODE" == "native" ]]; then
+  SCRIPT="montecarlo.py"
+  shift
+elif [[ "$MODE" == "mpi" ]]; then
+  SCRIPT="montecarlo_mpi.py"
+  shift
+else
+  # Default mode = native, no shift because first arg is actually samples_per_job
+  SCRIPT="montecarlo.py"
+fi
+
+# Now $1 and $2 are samples_per_job and bounds, possibly shifted if mode was specified
 SAMPLES_PER_JOB="${1:-2000000}"
 BOUNDS="${2:-(-1,1),(-1,1)}"
 
-# Create a temporary PBS script
+
 PBS_SCRIPT="/tmp/calc_wrapper_$$.pbs"
 
 cat > "$PBS_SCRIPT" <<EOF
@@ -16,9 +30,8 @@ cat > "$PBS_SCRIPT" <<EOF
 #PBS -o /home/pbsuser/project/results/mc_out_\${PBS_ARRAY_INDEX}.txt
 #PBS -e /home/pbsuser/project/results/mc_err_\${PBS_ARRAY_INDEX}.txt
 
-# Job config from wrapper
 SAMPLES_PER_JOB=${SAMPLES_PER_JOB}
-BOUNDS="${BOUNDS}"
+BOUNDS='${BOUNDS}'
 
 mkdir -p /home/pbsuser/project/results
 
@@ -37,13 +50,11 @@ echo "  Samples per job: \${SAMPLES_PER_JOB}"
 echo "  Bounds: \${BOUNDS}"
 echo ""
 
-# Run Monte Carlo with arguments
-python3 montecarlo.py \${PBS_ARRAY_INDEX} \${SAMPLES_PER_JOB} "\${BOUNDS}"
+python3 ${SCRIPT} \${PBS_ARRAY_INDEX} \${SAMPLES_PER_JOB} "\${BOUNDS}"
 
 echo ""
 echo "Job \${PBS_ARRAY_INDEX} completed at: \$(date)"
 echo "========================================="
 EOF
 
-# Submit the job
 qsub "$PBS_SCRIPT"

@@ -22,6 +22,11 @@ fi
 
 mkdir -p /shared-ssh
 cp "$KEY_FILE.pub" "/shared-ssh/$(hostname)_id_rsa.pub"
+cat > "$SSH_DIR/config" <<EOF
+Host *
+    StrictHostKeyChecking no
+    UserKnownHostsFile=/dev/null
+EOF
 
 # Run postinstall if necessary
 echo "Running PBS postinstall..."

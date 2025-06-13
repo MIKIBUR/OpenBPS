@@ -1,8 +1,8 @@
 =========================================
 Parallel Monte Carlo Job 1
-Started at: Tue Jun 10 19:06:29 UTC 2025
+Started at: Fri Jun 13 16:14:42 UTC 2025
 Running on: worker1
-PBS Job ID: 10[1].openpbs
+PBS Job ID: 2008[1].openpbs
 Array Index: 1
 =========================================
 Configuration:
@@ -14,7 +14,7 @@ Samples: 2000000
 Bounds: ((-1, 1), (-1, 1))
 Job 1 completed successfully
 Result: -0.000390 ± 0.000211
-Time: 3.85 seconds
+Time: 3.73 seconds
 
-Job 1 completed at: Tue Jun 10 19:06:33 UTC 2025
+Job 1 completed at: Fri Jun 13 16:14:45 UTC 2025
 =========================================

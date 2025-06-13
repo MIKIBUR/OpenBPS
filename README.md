@@ -26,7 +26,7 @@ docker exec -it openpbs bash
  ```bash
 su - pbsuser
  ```
-5. **Run the PBS script**:
+5. **Run the PBS script with default values**:
  ```bash
-qsub project/calc.pbs
+project/run.sh
  ```
