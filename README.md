@@ -51,3 +51,7 @@ Before you begin, ensure the following tools are installed on your system:
 ⚠️ **Disclaimer**:  
 The number of nodes used in the job is **not currently parameterized** due to the complexity of configuring multi-node setups in Docker-based environments.  
 If you require multiple nodes, you will need to set this up manually within your Docker/OpenPBS configuration.
+⚠️ **Disclaimer no. 2**:
+When encountering errors connected with entrypoint.sh like this one: 
+`exec: "./entrypoint.sh": stat ./entrypoint.sh: no such file or directory: unknown`
+Make sure you have linux line endings `LF` in all .sh files as it may cause serious issues!
