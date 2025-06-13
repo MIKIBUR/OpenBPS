@@ -21,7 +21,7 @@ Before you begin, ensure the following tools are installed on your system:
 2. **Start the OpenPBS container** using Docker Compose:
 
    ```bash
-   docker compose up -d
+   docker compose up -d --build
    ```
 
 3. **Access the running container**:
