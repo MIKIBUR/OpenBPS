@@ -42,8 +42,7 @@ def run_monte_carlo_job(job_id, samples_per_job, bounds, method='uniform'):
     
     start_time = time.time()
     
-    # Run calculation based on method
-
+    # Run calculation
     result, error = mc.uniform_sampling(test_function_2d, bounds, samples_per_job)
     
     end_time = time.time()

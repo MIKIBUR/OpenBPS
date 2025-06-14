@@ -8,13 +8,12 @@ echo "Running PBS postinstall..."
 
 echo "reject_remote_stage = true" > /var/spool/pbs/mom_priv/config
 
-# Create pbsuser if not exists
+# Create pbsuser if not exists and set its password to empty string
 if ! id -u pbsuser >/dev/null 2>&1; then
-    echo "Creating user pbsuser"
-    useradd -m -s /bin/bash pbsuser
+  echo "Creating user pbsuser"
+  useradd -m -s /bin/bash pbsuser
+  usermod -p '' pbsuser
 fi
-
-usermod -p '' pbsuser
 
 # Ensure mounted project directory exists and is owned by pbsuser
 mkdir -p /home/pbsuser/project
@@ -22,6 +21,7 @@ chown -R pbsuser:pbsuser /home/pbsuser/project
 USER_HOME=/home/pbsuser
 SSH_DIR="$USER_HOME/.ssh"
 
+# Configure SSH for no authentication, acceptable in this demo project
 SSHD_CONFIG="/etc/ssh/sshd_config"
 cat <<EOF > "$SSHD_CONFIG"
 Port 22
@@ -55,7 +55,7 @@ service ssh start
 # Start PBS service
 /etc/init.d/pbs start
 
-# Add nodes if missing
+# Add workers nodes if missing
 add_node_if_missing() {
   NODE_NAME=$1
   if ! qmgr -c "list node $NODE_NAME" &>/dev/null; then

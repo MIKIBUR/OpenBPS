@@ -50,7 +50,6 @@ RUN git clone https://github.com/openpbs/openpbs.git /openpbs && \
 # Run OpenPBS post-install setup
 RUN chmod 4755 /opt/pbs/sbin/pbs_iff /opt/pbs/sbin/pbs_rcp
 
-
 # Ensure PBS environment is sourced in shells
 RUN echo "source /etc/profile.d/pbs.sh" >> /etc/bash.bashrc
 

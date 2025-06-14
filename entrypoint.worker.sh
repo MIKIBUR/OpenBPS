@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+# Create pbsuser if not exists
 if ! id -u pbsuser >/dev/null 2>&1; then
     echo "Creating user pbsuser"
     useradd -m -s /bin/bash pbsuser
@@ -15,6 +16,7 @@ mkdir -p "$SSH_DIR"
 chown -R pbsuser:pbsuser "$SSH_DIR"
 chmod 700 "$SSH_DIR"
 
+# Configure SSH to accept hosts' key automatically
 cat > "$SSH_DIR/config" <<EOF
 Host *
     StrictHostKeyChecking no

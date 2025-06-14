@@ -39,7 +39,8 @@ cat > "$PBS_SCRIPT" <<EOF
 #PBS -l walltime=00:05:00
 #PBS -l select=1:ncpus=1
 #PBS -e /home/pbsuser/project/results/mc_err.txt
-
+#PBS -o /home/pbsuser/project/results/mc_out.txt
+set -e
 SAMPLES_PER_JOB=${SAMPLES_PER_JOB}
 BOUNDS='${BOUNDS}'
 
@@ -61,6 +62,7 @@ echo "  Bounds: \${BOUNDS}"
 echo ""
 
 # Run the appropriate Python script
+python3 montecarlo.py \${PBS_ARRAY_INDEX} \${SAMPLES_PER_JOB} "\${BOUNDS}"
 EOF
 
 
